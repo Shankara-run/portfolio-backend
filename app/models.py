@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer, String
+from sqlalchemy import Column,Integer, String, Boolean
 from app.database import Base
 
 class Objective(Base):
@@ -8,3 +8,41 @@ class Objective(Base):
     summary= Column(String)
     hidden_summary =  Column(String)
 
+class Skill(Base):
+    __tablename__= "Skills"
+
+    id = Column (Integer, primary_key=True, index=True)
+    category= Column(String, nullable=False)
+    tools= Column(String, nullable=False)
+    is_hidden_skill= Column( Boolean , default=False)
+
+class Experience(Base):
+    __tablename__= "Experiences"
+
+    id= Column(Integer,primary_key=True, index=True)
+    title= Column(String, nullable=False)
+    company= Column(String, nullable=False)
+    time= Column(String,nullable=False)
+    location=Column(String,nullable=False)
+    work_description= Column(String, nullable=False)
+    is_hidden= Column(Boolean, default=False)
+
+class Education(Base):
+    __tablename__= "Educations"
+
+    id = Column(Integer,primary_key=True,index=True)
+    institute= Column(String, nullable=False)
+    year= Column(String, nullable=False)
+    marks= Column(String, nullable=False)
+    category= Column(String, nullable=False)
+    is_hidden= Column(String, nullable=False)
+
+class Project (Base):
+    __tablename__= "Projects"
+
+    id = Column(Integer,primary_key=True, index=True)
+    title= Column(String, nullable=False)
+    time= Column(String, nullable=False)
+    tech_stack= Column (String, nullable=False) 
+    project_description= Column(String, nullable=False)
+    is_hidden= Column(Boolean, default=False)
