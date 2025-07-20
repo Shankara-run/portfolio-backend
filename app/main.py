@@ -32,18 +32,18 @@ def read_root():
 def get_objectives(db: Session = Depends(get_db)):
     return db.query(models.Objective).all()
 
-@app.get("/Skills",response_model=list[schemas.Skill])
+@app.get("/skills",response_model=list[schemas.Skill])
 def get_skills(db: Session= Depends(get_db)):
     return db.query(models.Skill).all()
 
-@app.get("/Experiences",response_model=list[schemas.Experience])
+@app.get("/experiences",response_model=list[schemas.Experience])
 def get_Experiences(db: Session=Depends(get_db)):
     return db.query(models.Experience).all()
 
-@app.get("/Education", response_model=list[schemas.Education])
+@app.get("/educations", response_model=list[schemas.Education])
 def get_Education(db:Session=Depends(get_db)):
     return db.query(models.Education).all()
 
-@app.get("/Projects",response_model=list[schemas.Project])
+@app.get("/projects",response_model=list[schemas.Project])
 def get_projects(db:Session=Depends(get_db)):
     return db.query(models.Project).all()
