@@ -47,3 +47,7 @@ def get_Education(db:Session=Depends(get_db)):
 @app.get("/projects",response_model=list[schemas.Project])
 def get_projects(db:Session=Depends(get_db)):
     return db.query(models.Project).all()
+
+@app.get("/profile", response_model=list[schemas.Profile])
+def get_profile(db: Session = Depends(get_db)):
+    return db.query(models.Profile).all()

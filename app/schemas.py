@@ -8,6 +8,27 @@ class Objective(ObejectiveBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
+from pydantic import BaseModel
+from pydantic.config import ConfigDict
+
+class ProfileBase(BaseModel):
+    
+    name: str
+    title: str
+    email: str
+    image: str
+    project_website: str
+    contact: str
+    linkedin: str
+    instagram: str
+    is_hidden: bool=False
+
+class Profile(ProfileBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
+
+
+
 class SkillBase(BaseModel):
     category : str
     tools : str

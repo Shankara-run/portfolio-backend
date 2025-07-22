@@ -8,6 +8,22 @@ class Objective(Base):
     summary= Column(String)
     hidden_summary =  Column(String)
 
+
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    title = Column(String)
+    email = Column(String)
+    image = Column(String)
+    project_website = Column(String)
+    contact = Column(String)
+    linkedin = Column(String)
+    instagram = Column(String)
+    is_hidden = Column(Boolean)
+
+
 class Skill(Base):
     __tablename__= "Skills"
 
