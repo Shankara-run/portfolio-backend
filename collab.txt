@@ -1,0 +1,38 @@
+!pip install fastapi uvicorn pyngrok transformers accelerate bitsandbytes --quiet
+!pip install nest_asyncio --quiet
+
+import nest_asyncio, threading
+from fastapi import FastAPI, Request
+from pyngrok import ngrok
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+# --- Load TinyLlama on GPU ---
+MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map="auto")
+llm = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=60)
+
+# --- Setup FastAPI ---
+app = FastAPI()
+
+@app.post("/generate")
+async def generate(req: Request):
+    data = await req.json()
+    prompt = data.get("prompt", "")
+    if not prompt:
+        return {"response": "Error: Prompt is empty"}
+    output = llm(prompt)[0]["generated_text"]
+
+    response_text = response.json().get("response", "")
+    if prompt in response_text:
+      response_text = response_text.split("<|assistant|>")[-1].strip()
+
+# --- Start ngrok tunnel ---
+ngrok.set_auth_token("30d45g6N10wGgcmwKxt748KVbgJ_4ejGh1UyiQfkuk1ZS1DRU")
+public_url = ngrok.connect(8000)  # ✅ match port with uvicorn
+print("COLAB_LLM_URL =", public_url)
+
+# --- Run FastAPI asynchronously in Colab ---
+import uvicorn
+nest_asyncio.apply()
+threading.Thread(target=lambda: uvicorn.run(app, host="0.0.0.0", port=8000), daemon=True).start()

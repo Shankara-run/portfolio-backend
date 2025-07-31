@@ -1,22 +1,18 @@
-import faiss
 import numpy as np
+import faiss
 from sentence_transformers import SentenceTransformer
 from sqlalchemy.orm import Session
 from . import models
 
-# Load small, fast embedding model
 embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-
-# Store FAISS index and corpus map
 faiss_index = None
-corpus_map = []  # list of strings
+corpus_map = []
+corpus_embeddings = None  # store embeddings for filtering
 
 def build_rag_index(db: Session):
-    """Load all portfolio data into FAISS index"""
-    global faiss_index, corpus_map
+    global faiss_index, corpus_map, corpus_embeddings
     rows = []
 
-    # Combine all portfolio info as text for embeddings
     for obj in db.query(models.Objective).all():
         rows.append(f"Objective: {obj.summary}")
     for skill in db.query(models.Skill).all():
@@ -31,28 +27,37 @@ def build_rag_index(db: Session):
     corpus_map = rows
     if not rows:
         faiss_index = None
-        print("[RAG] No portfolio data found. FAISS index not built.")
         return
 
-    # ✅ Encode and convert to float32 2D array
     embeddings = embed_model.encode(rows)
-    embeddings = np.array(embeddings, dtype=np.float32)
+    corpus_embeddings = np.array(embeddings, dtype=np.float32)
 
-    # ✅ Create FAISS index
-    dim = embeddings.shape[1]
-    faiss_index = faiss.IndexFlatL2(dim)
-    faiss_index.add(embeddings)
-    print(f"[RAG] Built FAISS index with {len(rows)} entries, dim={dim}")
+    dim = corpus_embeddings.shape[1]
+    faiss_index = faiss.IndexFlatIP(dim)  # use Inner Product for cosine similarity
+    # normalize for cosine similarity
+    faiss.normalize_L2(corpus_embeddings)
+    faiss_index.add(corpus_embeddings)
 
-def semantic_search(query: str, k: int = 3):
-    """Return top-k relevant portfolio entries"""
+    print(f"[RAG] Built FAISS index with {len(rows)} entries")
+
+def semantic_search(query: str, k: int = 2, score_threshold: float = 0.3):
+    """Return top-k relevant entries filtered by cosine similarity threshold"""
+    global faiss_index, corpus_map
+
     if faiss_index is None or not corpus_map:
         return []
+
+    # Encode and normalize for cosine similarity
     q_emb = embed_model.encode([query])
-    q_emb = np.array(q_emb, dtype=np.float32).reshape(1, -1)  # ✅ 2D float32
+    q_emb = np.array(q_emb, dtype=np.float32)
+    faiss.normalize_L2(q_emb)
 
-    # ✅ Ensure k does not exceed corpus size
     k = min(k, len(corpus_map))
-    distances, indices = faiss_index.search(q_emb, k)
+    distances, indices = faiss_index.search(q_emb, k)  # ✅ Correct call
 
-    return [corpus_map[i] for i in indices[0]]
+    results = []
+    for score, idx in zip(distances[0], indices[0]):
+        if score >= score_threshold:  # ✅ Filter irrelevant rows
+            results.append(corpus_map[idx])
+
+    return results

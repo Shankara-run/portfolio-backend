@@ -1,24 +1,29 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
+class ChatMessageBase(BaseModel):
+    user_message: str
+    ai_response: str
 
 class ChatMessageCreate(BaseModel):
     message: str
 
 class ChatMessageResponse(BaseModel):
     success: bool
-    response: Optional[str] = None
-    error: Optional[str] = None
-    message_id: Optional[int] = None
-
+    response: str | None = None
+    message_id: int | None = None
+    error: str | None = None
 
 class ChatHistory(BaseModel):
     id: int
     user_message: str
     ai_response: str
+    user_role: str
+    ai_role: str
     timestamp: datetime
-    user_id: int
-    model_config = ConfigDict(from_attributes=True)
+
+    class Config:
+        orm_mode = True
 
 class Objective(BaseModel):
     id: int

@@ -1,7 +1,10 @@
+from app.database import engine
+from app.models import ChatMessage
 
-from .database import Base, engine
-from . import models  # Make sure all models are imported
+print("🔹 Dropping old chat_messages table...")
+ChatMessage.__table__.drop(engine, checkfirst=True)
 
-if __name__ == "__main__":
-    Base.metadata.create_all(bind=engine)
-    print("✅ Tables created successfully.")
+print("🔹 Creating new chat_messages table...")
+ChatMessage.__table__.create(engine, checkfirst=True)
+
+print("✅ chat_messages table recreated successfully with new columns.")
