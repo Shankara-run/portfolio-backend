@@ -1,18 +1,34 @@
-from pydantic import BaseModel,ConfigDict
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+from typing import Optional
 
-class ObejectiveBase(BaseModel):
-    summary: str
-    hidden_summary: str
+class ChatMessageCreate(BaseModel):
+    message: str
 
-class Objective(ObejectiveBase):
+class ChatMessageResponse(BaseModel):
+    success: bool
+    response: Optional[str] = None
+    error: Optional[str] = None
+    message_id: Optional[int] = None
+
+
+class ChatHistory(BaseModel):
     id: int
+    user_message: str
+    ai_response: str
+    timestamp: datetime
+    user_id: int
     model_config = ConfigDict(from_attributes=True)
 
-from pydantic import BaseModel
-from pydantic.config import ConfigDict
-
-class ProfileBase(BaseModel):
+class Objective(BaseModel):
+    id: int
+    summary: str
+    hidden_summary: str
     
+    model_config = ConfigDict(from_attributes=True)
+
+class Profile(BaseModel):
+    id: int
     name: str
     title: str
     email: str
@@ -21,13 +37,9 @@ class ProfileBase(BaseModel):
     contact: str
     linkedin: str
     instagram: str
-    is_hidden: bool=False
-
-class Profile(ProfileBase):
-    id: int
+    is_hidden: bool
+    
     model_config = ConfigDict(from_attributes=True)
-
-
 
 class SkillBase(BaseModel):
     category : str

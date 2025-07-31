@@ -2,3 +2,7 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic
+requests==2.31.0
+torch
+transformers
+accelerate
