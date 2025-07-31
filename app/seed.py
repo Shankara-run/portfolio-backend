@@ -4,7 +4,17 @@ from app.models import Objective
 from app.models import Skill, Education, Experience, Project
 from app.models import Profile 
 
+from app import models
+from app.rag_service import build_rag_index
+
+# Start DB session
 db: Session = SessionLocal()
+
+# Step 1: Clear old data
+print("Clearing old data...")
+for table in [models.Objective, models.Skill, models.Education, models.Experience, models.Project, models.Profile]:
+    db.query(table).delete()
+db.commit()
 
 obj1 = Objective(summary="I am a Dedicated and adaptable developer with a foundation in backend systems, enterprise-grade software support, and technical operations. With over 4 years of hands-on experience across software engineering, fraud systems, and platform support, I aim to contribute to reliable, scalable backend solutions. My broader experience running real-world operations also helps me support teams with ownership, clarity, and coordination.",
                  hidden_summary= "Hands-on experience in food service, business operations, and creative projects. Managed daily operations, supported kitchen teams, and worked on customer experience. Also contributed to branding and marketing efforts for small businesses. Skilled in coordination, problem-solving, and delivering practical solutions across diverse work environments.")
@@ -53,11 +63,35 @@ experience = [
         is_hidden= False
     ),
     Experience(
-        title= "Volunteer Chef",
-        company= "South Indian & French Bakery",
-        time= "2022-2023",
+        title= "Manager (Operations & Guest Experience)",
+        company= "Himalayan Vegan Café",
+        time= "Mar 2022 – Aug 2022 ",
         location= "Kullu, Himachal Pradesh",
-        work_description= "Managed kitchen and guided tourists",
+        work_description= "Oversaw customer satisfaction, curated seasonal menus, and organized logistics for trekking groups.",
+        is_hidden= True
+    ),
+    Experience(
+        title= "Volunteer Production assistant and Social Marketer",
+        company= "Chotus French Bakery",
+        time= "Mar 2022 – Aug 2022 ",
+        location= "Pushkar, Rajasthan",
+        work_description= "Supported artisanal French baking under a European-trained master baker.",
+        is_hidden= True
+    ),
+    Experience(
+        title= "Junior Sous Chef ",
+        company= "Sorissa Fine Dining Restaurant",
+        time= "Sep 2021 – Feb 2022 ",
+        location= "Pernem, Goa",
+        work_description= "Worked under a Marriott-experienced head chef preparing continental, seafood, and gourmet cuisines.",
+        is_hidden= True
+    ),
+    Experience(
+        title= "Kitchen Operations Intern ",
+        company= "Diff42 Restro Bar",
+        time= "Mar 2021 – Aug 2021 ",
+        location= "Chennai, Tamil Nadu",
+        work_description= "Developed speed and precision in knife work, pan techniques, and kitchen coordination.",
         is_hidden= True
     )
 ]
@@ -86,33 +120,55 @@ education = [
 ]
 
 projects= [
+    
     Project(
-        title="Spend & Matter Management Web App",
-        time= "2016",
-        tech_stack= "Eclipse IDE | Java (Spring MVC) | Microsoft SQL Server | Tomcat | 2016",
-        project_description= "Designed a basic web app with user login and data entry features, fully connected to a backend database. Built interactive front-end forms with input checks using JavaScript. Developed and tested the project using Eclipse IDE and deployed it locally on Apache Tomcat for demonstration.",
-        is_hidden= False
-    ),
-    Project(
-        title="Digital Products ECart – Desktop Application",
-        time= "2015",
-        tech_stack= "Visual Basic | .NET | Microsoft Access | XML ",
-        project_description= "Created a simple e-commerce prototype using Microsoft Access and Visual Basic. Designed linked database tables for users, products, and orders. Built a user interface with login, product listing, and checkout features. Used XML to load products and save cart data for flexible data handling with the Access database.",
-        is_hidden= False
-    ),
-   
-    Project(
-        title="Personal Portfolio Website ",
+        title="Personal Portfolio Chat Agent",
         time= "2025",
-        tech_stack= "VS Code | FastAPI (Python) | SQLite | React | Tailwind CSS ",
-        project_description= "Created a portfolio website with a FastAPI backend and SQLite for storing content. Built a responsive React frontend using Tailwind CSS for clean UI components. Connected backend APIs to dynamically display project details, skills, and timeline data throughout the site.",
+        tech_stack= "VS Code | AI | ML | LLM | RAG ",
+        project_description= "Added Seperate additional component for chat in Portfolio, with a pre-trained llm and a RAG defined from the datasets in the website",
         is_hidden= False
     ),
+    Project(
+        title="Personal Portfolio Website Backend",
+        time= "2025",
+        tech_stack= "VS Code | FastAPI | Python | SQLite ",
+        project_description= "Created a portfolio backend with proper modules schemas and API endpoints",
+        is_hidden= False
+    ),
+    Project(
+        title="Personal Portfolio Website Frontend",
+        time= "2025",
+        tech_stack= "VS Code | React | Tailwind CSS ",
+        project_description= "Built a responsive React frontend using Tailwind CSS for clean UI components. Connected backend APIs to dynamically display project details, skills, and timeline data throughout the site.",
+        is_hidden= False
+    ),
+     Project(
+        title="CPU Temp",
+        time= "2025",
+        tech_stack= "VS Code | Python | WMI interface | CLI | Python ",
+        project_description= "Created a CLI app to check the CPU temperature from WMI a core component of Windows that provides a standardized interface for accessing and managing system information and operations",
+        is_hidden= False
+    ),
+
     Project(
         title="Save Mother Earth",
         time= "2019",
         tech_stack= "Adobe After Effects, Adobe Premiere Pro",
-        project_description= "A project to show and experience a Music beats mapped video",
+        project_description= "A project experiment to display waves in 360* mapped to the music beats in a video",
+        is_hidden= True
+    ),
+      Project(
+        title="Personal Portait depicted in the Future",
+        time= "2019",
+        tech_stack= "Adobe Photoshop, Adobe Illustrator",
+        project_description= "A project experiment to trace my image to a vector format",
+        is_hidden= True
+    ),
+    Project(
+        title="Food & Travel Research Project",
+        time= "Jan 2021 – Feb 2021 ",
+        tech_stack= "Solo Ride, 4000kms in single strech, Rode acros 8 Indian states ",
+        project_description= "Collected documentation for potential brand content development and experiential tourism mapping.",
         is_hidden= True
     )
 ]
@@ -134,7 +190,7 @@ profiles = [
         name="Shankara",
         title="Freelance Bussiness Operations",
         email="tsarunshankar@email.com",
-        linkedin="https://www.linkedin.com/in/arun-shankar-t-s",
+        linkedin="https://www.instagram.com/shankara_in_kasol",
         instagram="https://www.instagram.com/shankara_in_kasol",
         project_website="https://www.behance.net/arunshankarts",
         image="/images/hidden_profile.jpg",

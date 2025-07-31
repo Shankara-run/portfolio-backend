@@ -40,7 +40,7 @@ def build_rag_index(db: Session):
 
     print(f"[RAG] Built FAISS index with {len(rows)} entries")
 
-def semantic_search(query: str, k: int = 2, score_threshold: float = 0.3):
+def semantic_search(query: str, k: int = 1, score_threshold: float = 0.3):
     """Return top-k relevant entries filtered by cosine similarity threshold"""
     global faiss_index, corpus_map
 
